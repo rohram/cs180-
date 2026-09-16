@@ -1,0 +1,32 @@
+[
+  {
+    "name": "lastochkino",
+    "record_url": "https://www.loc.gov/pictures/item/2018679063/",
+    "download_url": "https://tile.loc.gov/storage-services/master/pnp/prok/00100/00188a.tif",
+    "bytes": 71960254,
+    "width": 3700,
+    "height": 9723,
+    "mode": "I;16",
+    "sha256": "8f16869164c71afe181e623d28b87489814faee5b85c370f32332641084ac2e8"
+  },
+  {
+    "name": "lugano",
+    "record_url": "https://www.loc.gov/pictures/item/2018679128/",
+    "download_url": "https://tile.loc.gov/storage-services/master/pnp/prok/00200/00215a.tif",
+    "bytes": 73572076,
+    "width": 3779,
+    "height": 9733,
+    "mode": "I;16",
+    "sha256": "bdb4c8cbffcb021231209a93bee9ac5d22af76766a097e7538674c13b897f78c"
+  },
+  {
+    "name": "woman_by_yurt",
+    "record_url": "https://www.loc.gov/item/2018681253/",
+    "download_url": "https://tile.loc.gov/storage-services/master/pnp/prok/00000/00087a.tif",
+    "bytes": 72070194,
+    "width": 3743,
+    "height": 9626,
+    "mode": "I;16",
+    "sha256": "d801ae1064bc8db18129771e8a45cc22e8eb14279e19c3e500af0af22fdc354d"
+  }
+]

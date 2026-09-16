@@ -1,0 +1,23 @@
+# Local environments and system files
+.DS_Store
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+
+# Full-resolution inputs, generated outputs, and local packaging
+CS180_fa2026_proj1_data/
+output/
+output_pixel/
+output_single/
+archive/
+tmp/
+submission/
+submission.zip
+*.tif
+*.tiff
+
+# Assignment code is submitted privately through Gradescope
+/code/

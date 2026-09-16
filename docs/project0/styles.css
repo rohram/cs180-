@@ -1,0 +1,13 @@
+/* The shared project stylesheet supplies the portfolio theme. */
+.camera-banner{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.camera-banner a{position:relative;display:block;height:300px;overflow:hidden;background:#e5e2da}
+.camera-banner img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 43%}
+.camera-banner span{position:absolute;bottom:15px;left:15px;background:#f6f4eef0;padding:8px 12px;color:#222b33;font:10px/1.5 monospace;letter-spacing:.5px;text-transform:uppercase}
+.photo-pair{margin-top:28px;margin-bottom:28px;align-items:start}
+.dolly-grid{display:block;max-width:640px}
+.photo-pair+.explanation{margin-top:28px}
+footer>a:last-child{text-align:right}
+@media(max-width:1000px){.title-row{display:block}.subtitle{margin-top:20px}.subtitle br{display:none}.camera-banner a{height:260px}}
+@media(max-width:750px){.camera-banner{gap:8px}.camera-banner a{height:200px}.camera-banner span{bottom:10px;left:10px;font-size:9px;padding:6px 8px}}
+@media(max-width:480px){.camera-banner a{height:170px}.camera-banner span{font-size:8px;padding:5px 6px}}
+@media print{.camera-banner{display:none}.photo-pair{grid-template-columns:repeat(2,minmax(0,1fr))}}

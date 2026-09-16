@@ -1,0 +1,298 @@
+{
+  "assets/single-cathedral.jpg": {
+    "width": 390,
+    "height": 341,
+    "left": 0.045,
+    "top": 0.055,
+    "right": 0.055,
+    "bottom": 0.04
+  },
+  "assets/single-monastery.jpg": {
+    "width": 391,
+    "height": 341,
+    "left": 0.045,
+    "top": 0.055,
+    "right": 0.035,
+    "bottom": 0.04
+  },
+  "assets/single-tobolsk.jpg": {
+    "width": 396,
+    "height": 341,
+    "left": 0.065,
+    "top": 0.04,
+    "right": 0.035,
+    "bottom": 0.04
+  },
+  "assets/pyramid-cathedral.jpg": {
+    "width": 390,
+    "height": 341,
+    "left": 0.045,
+    "top": 0.055,
+    "right": 0.055,
+    "bottom": 0.04
+  },
+  "assets/pyramid-church.jpg": {
+    "width": 1600,
+    "height": 1410,
+    "left": 0.025,
+    "top": 0.025,
+    "right": 0.065,
+    "bottom": 0.05
+  },
+  "assets/pyramid-emir.jpg": {
+    "width": 1600,
+    "height": 1387,
+    "left": 0.06,
+    "top": 0.065,
+    "right": 0.035,
+    "bottom": 0.055
+  },
+  "assets/pyramid-harvesters.jpg": {
+    "width": 1600,
+    "height": 1398,
+    "left": 0.04,
+    "top": 0.08,
+    "right": 0.065,
+    "bottom": 0.03
+  },
+  "assets/pyramid-icon.jpg": {
+    "width": 1600,
+    "height": 1387,
+    "left": 0.04,
+    "top": 0.035,
+    "right": 0.035,
+    "bottom": 0.025
+  },
+  "assets/pyramid-ilemselga.jpg": {
+    "width": 1600,
+    "height": 1377,
+    "left": 0.07,
+    "top": 0.07,
+    "right": 0.04,
+    "bottom": 0.045
+  },
+  "assets/pyramid-melons.jpg": {
+    "width": 1600,
+    "height": 1375,
+    "left": 0.04,
+    "top": 0.075,
+    "right": 0.06,
+    "bottom": 0.025
+  },
+  "assets/pyramid-monastery.jpg": {
+    "width": 391,
+    "height": 341,
+    "left": 0.045,
+    "top": 0.055,
+    "right": 0.035,
+    "bottom": 0.04
+  },
+  "assets/pyramid-religous_painting.jpg": {
+    "width": 1600,
+    "height": 1365,
+    "left": 0.05,
+    "top": 0.045,
+    "right": 0.04,
+    "bottom": 0.045
+  },
+  "assets/pyramid-self_portrait.jpg": {
+    "width": 1600,
+    "height": 1365,
+    "left": 0.065,
+    "top": 0.07,
+    "right": 0.105,
+    "bottom": 0.11
+  },
+  "assets/pyramid-siren.jpg": {
+    "width": 1600,
+    "height": 1362,
+    "left": 0.05,
+    "top": 0.07,
+    "right": 0.045,
+    "bottom": 0.035
+  },
+  "assets/pyramid-three_generations.jpg": {
+    "width": 1600,
+    "height": 1382,
+    "left": 0.04,
+    "top": 0.075,
+    "right": 0.06,
+    "bottom": 0.035
+  },
+  "assets/pyramid-tobolsk.jpg": {
+    "width": 396,
+    "height": 341,
+    "left": 0.065,
+    "top": 0.04,
+    "right": 0.035,
+    "bottom": 0.04
+  },
+  "assets/pyramid-wharf.jpg": {
+    "width": 1600,
+    "height": 1380,
+    "left": 0.04,
+    "top": 0.055,
+    "right": 0.08,
+    "bottom": 0.055
+  },
+  "assets/pixel-cathedral.jpg": {
+    "width": 390,
+    "height": 341,
+    "left": 0.045,
+    "top": 0.055,
+    "right": 0.055,
+    "bottom": 0.04
+  },
+  "assets/pixel-church.jpg": {
+    "width": 1600,
+    "height": 1410,
+    "left": 0.025,
+    "top": 0.025,
+    "right": 0.065,
+    "bottom": 0.05
+  },
+  "assets/pixel-emir.jpg": {
+    "width": 1600,
+    "height": 1387,
+    "left": 0.06,
+    "top": 0.065,
+    "right": 0.035,
+    "bottom": 0.055
+  },
+  "assets/pixel-harvesters.jpg": {
+    "width": 1600,
+    "height": 1398,
+    "left": 0.04,
+    "top": 0.08,
+    "right": 0.065,
+    "bottom": 0.03
+  },
+  "assets/pixel-icon.jpg": {
+    "width": 1600,
+    "height": 1387,
+    "left": 0.04,
+    "top": 0.035,
+    "right": 0.035,
+    "bottom": 0.025
+  },
+  "assets/pixel-ilemselga.jpg": {
+    "width": 1600,
+    "height": 1377,
+    "left": 0.07,
+    "top": 0.07,
+    "right": 0.04,
+    "bottom": 0.045
+  },
+  "assets/pixel-melons.jpg": {
+    "width": 1600,
+    "height": 1375,
+    "left": 0.04,
+    "top": 0.075,
+    "right": 0.06,
+    "bottom": 0.025
+  },
+  "assets/pixel-monastery.jpg": {
+    "width": 391,
+    "height": 341,
+    "left": 0.045,
+    "top": 0.055,
+    "right": 0.035,
+    "bottom": 0.04
+  },
+  "assets/pixel-religous_painting.jpg": {
+    "width": 1600,
+    "height": 1365,
+    "left": 0.05,
+    "top": 0.045,
+    "right": 0.04,
+    "bottom": 0.045
+  },
+  "assets/pixel-self_portrait.jpg": {
+    "width": 1600,
+    "height": 1365,
+    "left": 0.065,
+    "top": 0.07,
+    "right": 0.105,
+    "bottom": 0.11
+  },
+  "assets/pixel-siren.jpg": {
+    "width": 1600,
+    "height": 1362,
+    "left": 0.05,
+    "top": 0.07,
+    "right": 0.045,
+    "bottom": 0.035
+  },
+  "assets/pixel-three_generations.jpg": {
+    "width": 1600,
+    "height": 1382,
+    "left": 0.04,
+    "top": 0.075,
+    "right": 0.06,
+    "bottom": 0.035
+  },
+  "assets/pixel-tobolsk.jpg": {
+    "width": 396,
+    "height": 341,
+    "left": 0.065,
+    "top": 0.04,
+    "right": 0.035,
+    "bottom": 0.04
+  },
+  "assets/pixel-wharf.jpg": {
+    "width": 1600,
+    "height": 1380,
+    "left": 0.04,
+    "top": 0.055,
+    "right": 0.08,
+    "bottom": 0.055
+  },
+  "assets/pixel-lastochkino.jpg": {
+    "width": 1600,
+    "height": 1402,
+    "left": 0.06,
+    "top": 0.08,
+    "right": 0.06,
+    "bottom": 0.06
+  },
+  "assets/pixel-lugano.jpg": {
+    "width": 1600,
+    "height": 1373,
+    "left": 0.075,
+    "top": 0.06,
+    "right": 0.06,
+    "bottom": 0.06
+  },
+  "assets/pyramid-lastochkino.jpg": {
+    "width": 1600,
+    "height": 1402,
+    "left": 0.06,
+    "top": 0.08,
+    "right": 0.06,
+    "bottom": 0.06
+  },
+  "assets/pyramid-lugano.jpg": {
+    "width": 1600,
+    "height": 1373,
+    "left": 0.075,
+    "top": 0.06,
+    "right": 0.06,
+    "bottom": 0.06
+  },
+  "assets/pixel-woman_by_yurt.jpg": {
+    "width": 1600,
+    "height": 1371,
+    "left": 0.06,
+    "top": 0.09,
+    "right": 0.07,
+    "bottom": 0.04
+  },
+  "assets/pyramid-woman_by_yurt.jpg": {
+    "width": 1600,
+    "height": 1371,
+    "left": 0.06,
+    "top": 0.09,
+    "right": 0.07,
+    "bottom": 0.04
+  }
+}

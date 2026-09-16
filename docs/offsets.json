@@ -1,0 +1,389 @@
+[
+  {
+    "mode": "single",
+    "name": "cathedral",
+    "source": "cathedral.jpg",
+    "green_dx": 2,
+    "green_dy": 5,
+    "red_dx": 3,
+    "red_dy": 12,
+    "asset": "assets/single-cathedral.jpg",
+    "saved_mean_absolute_error": 7.095077324109583
+  },
+  {
+    "mode": "single",
+    "name": "monastery",
+    "source": "monastery.jpg",
+    "green_dx": 2,
+    "green_dy": -3,
+    "red_dx": 2,
+    "red_dy": 3,
+    "asset": "assets/single-monastery.jpg",
+    "saved_mean_absolute_error": 7.141489976074581
+  },
+  {
+    "mode": "single",
+    "name": "tobolsk",
+    "source": "tobolsk.jpg",
+    "green_dx": 3,
+    "green_dy": 3,
+    "red_dx": 3,
+    "red_dy": 6,
+    "asset": "assets/single-tobolsk.jpg",
+    "saved_mean_absolute_error": 10.830892009044502
+  },
+  {
+    "mode": "pyramid",
+    "name": "cathedral",
+    "source": "cathedral.jpg",
+    "green_dx": 2,
+    "green_dy": 5,
+    "red_dx": 3,
+    "red_dy": 12,
+    "asset": "assets/pyramid-cathedral.jpg",
+    "saved_mean_absolute_error": 7.095077324109583
+  },
+  {
+    "mode": "pyramid",
+    "name": "church",
+    "source": "church.tif",
+    "green_dx": 4,
+    "green_dy": 25,
+    "red_dx": -4,
+    "red_dy": 58,
+    "asset": "assets/pyramid-church.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "emir",
+    "source": "emir.tif",
+    "green_dx": 24,
+    "green_dy": 49,
+    "red_dx": 40,
+    "red_dy": 107,
+    "asset": "assets/pyramid-emir.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "harvesters",
+    "source": "harvesters.tif",
+    "green_dx": 17,
+    "green_dy": 60,
+    "red_dx": 14,
+    "red_dy": 124,
+    "asset": "assets/pyramid-harvesters.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "icon",
+    "source": "icon.tif",
+    "green_dx": 17,
+    "green_dy": 42,
+    "red_dx": 23,
+    "red_dy": 90,
+    "asset": "assets/pyramid-icon.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "ilemselga",
+    "source": "ilemselga.tif",
+    "green_dx": 7,
+    "green_dy": 40,
+    "red_dx": 11,
+    "red_dy": 131,
+    "asset": "assets/pyramid-ilemselga.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "melons",
+    "source": "melons.tif",
+    "green_dx": 10,
+    "green_dy": 80,
+    "red_dx": 13,
+    "red_dy": 177,
+    "asset": "assets/pyramid-melons.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "monastery",
+    "source": "monastery.jpg",
+    "green_dx": 2,
+    "green_dy": -3,
+    "red_dx": 2,
+    "red_dy": 3,
+    "asset": "assets/pyramid-monastery.jpg",
+    "saved_mean_absolute_error": 7.141489976074581
+  },
+  {
+    "mode": "pyramid",
+    "name": "religous_painting",
+    "source": "religous_painting.tif",
+    "green_dx": 1,
+    "green_dy": 30,
+    "red_dx": 6,
+    "red_dy": 70,
+    "asset": "assets/pyramid-religous_painting.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "self_portrait",
+    "source": "self_portrait.tif",
+    "green_dx": 29,
+    "green_dy": 78,
+    "red_dx": 37,
+    "red_dy": 176,
+    "asset": "assets/pyramid-self_portrait.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "siren",
+    "source": "siren.tif",
+    "green_dx": -6,
+    "green_dy": 49,
+    "red_dx": -24,
+    "red_dy": 96,
+    "asset": "assets/pyramid-siren.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "three_generations",
+    "source": "three_generations.tif",
+    "green_dx": 12,
+    "green_dy": 53,
+    "red_dx": 9,
+    "red_dy": 111,
+    "asset": "assets/pyramid-three_generations.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pyramid",
+    "name": "tobolsk",
+    "source": "tobolsk.jpg",
+    "green_dx": 3,
+    "green_dy": 3,
+    "red_dx": 3,
+    "red_dy": 6,
+    "asset": "assets/pyramid-tobolsk.jpg",
+    "saved_mean_absolute_error": 10.830892009044502
+  },
+  {
+    "mode": "pyramid",
+    "name": "wharf",
+    "source": "wharf.tif",
+    "green_dx": -6,
+    "green_dy": 15,
+    "red_dx": -16,
+    "red_dy": 82,
+    "asset": "assets/pyramid-wharf.jpg",
+    "saved_mean_absolute_error": 0.0
+  },
+  {
+    "mode": "pixel",
+    "name": "cathedral",
+    "source": "cathedral.jpg",
+    "green_dx": 2,
+    "green_dy": 5,
+    "red_dx": 3,
+    "red_dy": 12,
+    "asset": "assets/pixel-cathedral.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "church",
+    "source": "church.tif",
+    "green_dx": 4,
+    "green_dy": 25,
+    "red_dx": 285,
+    "red_dy": 64,
+    "asset": "assets/pixel-church.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "emir",
+    "source": "emir.tif",
+    "green_dx": 24,
+    "green_dy": 49,
+    "red_dx": 44,
+    "red_dy": 66,
+    "asset": "assets/pixel-emir.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "harvesters",
+    "source": "harvesters.tif",
+    "green_dx": 17,
+    "green_dy": 59,
+    "red_dx": 13,
+    "red_dy": 124,
+    "asset": "assets/pixel-harvesters.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "icon",
+    "source": "icon.tif",
+    "green_dx": 17,
+    "green_dy": 41,
+    "red_dx": 23,
+    "red_dy": 89,
+    "asset": "assets/pixel-icon.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "ilemselga",
+    "source": "ilemselga.tif",
+    "green_dx": 7,
+    "green_dy": 40,
+    "red_dx": 11,
+    "red_dy": 130,
+    "asset": "assets/pixel-ilemselga.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "melons",
+    "source": "melons.tif",
+    "green_dx": 10,
+    "green_dy": 81,
+    "red_dx": 14,
+    "red_dy": 178,
+    "asset": "assets/pixel-melons.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "monastery",
+    "source": "monastery.jpg",
+    "green_dx": 2,
+    "green_dy": -3,
+    "red_dx": 2,
+    "red_dy": 3,
+    "asset": "assets/pixel-monastery.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "religous_painting",
+    "source": "religous_painting.tif",
+    "green_dx": 3,
+    "green_dy": 28,
+    "red_dx": 7,
+    "red_dy": 69,
+    "asset": "assets/pixel-religous_painting.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "self_portrait",
+    "source": "self_portrait.tif",
+    "green_dx": 29,
+    "green_dy": 78,
+    "red_dx": 37,
+    "red_dy": 176,
+    "asset": "assets/pixel-self_portrait.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "siren",
+    "source": "siren.tif",
+    "green_dx": -6,
+    "green_dy": 50,
+    "red_dx": -25,
+    "red_dy": 96,
+    "asset": "assets/pixel-siren.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "three_generations",
+    "source": "three_generations.tif",
+    "green_dx": 14,
+    "green_dy": 52,
+    "red_dx": 11,
+    "red_dy": 111,
+    "asset": "assets/pixel-three_generations.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "tobolsk",
+    "source": "tobolsk.jpg",
+    "green_dx": 3,
+    "green_dy": 3,
+    "red_dx": 3,
+    "red_dy": 6,
+    "asset": "assets/pixel-tobolsk.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "wharf",
+    "source": "wharf.tif",
+    "green_dx": -7,
+    "green_dy": 15,
+    "red_dx": -16,
+    "red_dy": 82,
+    "asset": "assets/pixel-wharf.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "lastochkino",
+    "source": "lastochkino.tif",
+    "green_dx": -2,
+    "green_dy": -3,
+    "red_dx": -9,
+    "red_dy": 75,
+    "asset": "assets/pixel-lastochkino.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "lugano",
+    "source": "lugano.tif",
+    "green_dx": -16,
+    "green_dy": 41,
+    "red_dx": -29,
+    "red_dy": 93,
+    "asset": "assets/pixel-lugano.jpg"
+  },
+  {
+    "mode": "pyramid",
+    "name": "lastochkino",
+    "source": "lastochkino.tif",
+    "green_dx": -2,
+    "green_dy": -3,
+    "red_dx": -8,
+    "red_dy": 76,
+    "asset": "assets/pyramid-lastochkino.jpg"
+  },
+  {
+    "mode": "pyramid",
+    "name": "lugano",
+    "source": "lugano.tif",
+    "green_dx": -17,
+    "green_dy": 41,
+    "red_dx": -29,
+    "red_dy": 92,
+    "asset": "assets/pyramid-lugano.jpg"
+  },
+  {
+    "mode": "pixel",
+    "name": "woman_by_yurt",
+    "source": "woman_by_yurt.tif",
+    "green_dx": 39,
+    "green_dy": 48,
+    "red_dx": 55,
+    "red_dy": 108,
+    "asset": "assets/pixel-woman_by_yurt.jpg"
+  },
+  {
+    "mode": "pyramid",
+    "name": "woman_by_yurt",
+    "source": "woman_by_yurt.tif",
+    "green_dx": 38,
+    "green_dy": 48,
+    "red_dx": 56,
+    "red_dy": 107,
+    "asset": "assets/pyramid-woman_by_yurt.jpg"
+  }
+]
