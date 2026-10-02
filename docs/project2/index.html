@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Rohit Raman's CS 180 Project 2: convolutions, finite differences, Gaussian filters, sharpening, hybrid images, and multiresolution blending.">
+<title>Project 2 | Rohit Raman</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="styles.css">
+<script src="../project.js" defer></script>
+</head>
+<body class="project2">
+<a class="skip-link" href="#part1-1">Skip to write-up</a>
+<main id="top">
+<nav class="portfolio-nav" aria-label="Project navigation"><a class="home-link" href="../index.html">↖ Rohit Raman <span>/ All projects</span></a><div><a href="../project0/index.html">Project 0</a><a href="../project1.html">Project 1</a><a href="index.html" aria-current="page">Project 2</a></div></nav>
+<header class="project-header">
+<p class="eyebrow">CS 180 <span>/</span> Project 02</p>
+<div class="title-row"><h1>Fun with filters<br><em>and frequencies.</em></h1><p class="subtitle">Convolutions, edges,<br>
+hybrid images,<br>
+and blending.</p></div>
+<div class="hero-images"><a href="#part2-2"><img src="assets/part2_2/basketball_deathstar_hybrid.png" alt="basketball / Death Star" width="400" height="400"><span>basketball / Death Star</span></a><a href="#part2-4"><img src="assets/part2_4/curry_final.png" alt="Curry / Dragon Ball" width="288" height="500"><span>Curry / Dragon Ball</span></a><a href="#part2-4"><img src="assets/part2_4/josh_final.png" alt="Josh / blue shell" width="500" height="281"><span>Josh / blue shell</span></a></div>
+<div class="header-caption"><span>Rohit Raman / UC Berkeley</span><span>Look up close, then farther away. Click any result to enlarge it.</span></div>
+</header>
+<div class="reading-layout"><aside class="contents"><p>On this page</p><nav aria-label="Sections"><a href="#part1-1">1.1 <span>Convolutions</span></a><a href="#part1-2">1.2 <span>Finite differences</span></a><a href="#part1-3">1.3 <span>DoG filters</span></a><a href="#part2-1">2.1 <span>Sharpening</span></a><a href="#part2-2">2.2 <span>Hybrid images</span></a><a href="#part2-3">2.3 <span>Stacks</span></a><a href="#part2-4">2.4 <span>Blending</span></a><a href="#reflection">↳ <span>Reflection / credits</span></a></nav><a class="pdf-link" href="https://cal-cs180.github.io/fa26/hw/proj2/index.html">Assignment ↗</a></aside><article>
+<section id="part1-1"><p class="section-label">Part 1.1</p><h2>Convolutions from scratch</h2>
+<p class="explanation">The code below uses four loops to compute the convolution of an image and kernel. We first flip the filter since convolution is defined as summation j summation k im[m - j][n - k] kernel[j][k], which means we flip the kernel across both the x and y dimensions. The outer two loops go through every location in the image, and the inner two loops go through every offset within the kernel to calculate the convolution.</p>
+<p class="explanation">The other implementation uses only two for loops, where we find the k x k patch around each image pixel, with k being the kernel size, and compute the sum of patch * flipped kernel using NumPy. We padded the borders with zeros so the kernel also works at the corners and edges. For our odd-sized kernels, we pad by (k - 1) / 2, which keeps the output the same size as the original image.</p>
+<h3 class="small-heading">zero padding</h3><pre><code>import numpy as np
+import skimage.io as skio
+from scipy.signal import convolve2d
+
+def pad_image(image, k):
+    p = (k - 1) // 2
+    return np.pad(image, p, mode=&#x27;constant&#x27;, constant_values=0)</code></pre>
+<h3 class="small-heading">four loops</h3><pre><code>def convolution_4(image, kernel):
+    kernel = np.flip(kernel)
+    h, w = image.shape
+    image = pad_image(image, 9)
+    result_image = np.zeros((h, w))
+    for i in range(h):
+        for j in range(w):
+            for k in range(-4, 5):
+                for l in range(-4, 5):
+                    result_image[i][j] += image[i + k + 4][j + l + 4] * kernel[k + 4][l + 4]
+
+    return result_image</code></pre>
+<h3 class="small-heading">two loops</h3><pre><code>def convolution_2(image, kernel):
+    kernel = np.flip(kernel)
+    h, w = image.shape
+    image = pad_image(image, 9)
+    result_image = np.zeros((h, w))
+
+    for row in range(h):
+        for col in range(w):
+            patch_matrix = image[row:row + 9, col:col + 9]
+            curr_matrix = np.sum(patch_matrix * kernel)
+            result_image[row][col] = curr_matrix
+
+    return result_image</code></pre>
+<p class="explanation">Our results shown below match scipy.signal.convolve2d with the same zero padding. The runtime benchmarks show that the four-loop implementation takes about 5.9 seconds, the two-loop implementation takes about 0.53 seconds, and SciPy takes about 0.018 seconds. The two-loop implementation is faster because NumPy handles the multiplication and summation within each patch.</p>
+<div class="table-wrap"><table class="runtime-table"><caption>One measured run on a 500 x 375 grayscale portrait, with 9 x 9 filters. Times are in seconds.</caption><thead><tr><th scope="col">filter</th><th scope="col">four loops</th><th scope="col">two loops</th><th scope="col">scipy</th></tr></thead><tbody><tr><th scope="row">box</th><td>5.864780</td><td>0.532263</td><td>0.017764</td></tr><tr><th scope="row">dx</th><td>5.905789</td><td>0.527948</td><td>0.017827</td></tr><tr><th scope="row">dy</th><td>5.867705</td><td>0.536544</td><td>0.017705</td></tr></tbody></table></div>
+<p class="explanation">The 9 x 9 box filter averages the surrounding 81 pixels, which makes the image smoother. The D_x and D_y difference filters approximate the partial derivatives along the x and y axes, so they highlight edges where the image intensity changes quickly in each direction.</p>
+<pre><code>gray_img = skio.imread(&#x27;input/part-1-far.jpg&#x27;, as_gray = True)
+box_filter = np.ones((9, 9)) / 81
+d_x = np.zeros((9, 9))
+d_y = np.zeros((9, 9))
+d_x[4, 3:6] = [1, 0, -1]
+d_y[3:6, 4] = [1, 0, -1]
+
+four = convolution_4(gray_img, box_filter)
+two = convolution_2(gray_img, box_filter)
+reference = convolve2d(gray_img, box_filter, mode = &#x27;same&#x27;, boundary = &#x27;fill&#x27;, fillvalue = 0)
+print(np.allclose(four, reference), np.allclose(two, reference))</code></pre>
+<div class="gallery columns-4">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_1/original.png" data-title="original grayscale portrait" data-crop="--crop-ratio:0.750000;">
+<img src="assets/part1_1/original.png" alt="original grayscale portrait" width="375" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>original grayscale portrait</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_1/box.png" data-title="9 x 9 box filter" data-crop="--crop-ratio:0.750000;">
+<img src="assets/part1_1/box.png" alt="9 x 9 box filter" width="375" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>9 x 9 box filter</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_1/dx.png" data-title="x derivative" data-crop="--crop-ratio:0.750000;">
+<img src="assets/part1_1/dx.png" alt="x derivative" width="375" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>x derivative</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_1/dy.png" data-title="y derivative" data-crop="--crop-ratio:0.750000;">
+<img src="assets/part1_1/dy.png" alt="y derivative" width="375" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>y derivative</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part1_1/implementations.jpg" data-title="four-loop, two-loop, and scipy results for each filter; both NumPy implementations match scipy" data-crop="--crop-ratio:0.865169;">
+<img src="assets/part1_1/implementations.jpg" alt="four-loop, two-loop, and scipy results for each filter; both NumPy implementations match scipy" width="847" height="979" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>four-loop, two-loop, and scipy results for each filter; both NumPy implementations match scipy</figcaption></figure>
+<p class="explanation">For the derivative images, zero is shown as middle gray, with negative values darker and positive values brighter. This is only for displaying the results.</p>
+</section>
+<section id="part1-2"><p class="section-label">Part 1.2</p><h2>Finite differences</h2>
+<p class="explanation">The derivative images along x and y show where the intensity changes quickly in each direction, which is usually where there’s an edge. An edge often separates a darker region from a brighter region, so the derivative has a large positive or negative value depending on the direction of the intensity change, whether we are going from dark to light or light to dark respectively. The gradient points in the direction where intensity increases the fastest.</p>
+<p class="explanation">The magnitude of the gradient is calculated using sqrt(dx ** 2 + dy ** 2) since the gradient is a vector [dx, dy]. This combines the changes in both directions into one value showing how strong the edge is.</p>
+<p class="explanation">The threshold we chose was 0.2 since at 0.1 and 0.15, the ground still had a lot of distracting detail. Keeping only gradient magnitudes above 0.2 preserves the stronger edges while removing many weaker responses in the grass. These weaker responses come from fine texture and small intensity variations, which can include noise. This makes the main edges clearer, although some weaker real edges are also removed.</p>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_2/dx.png" data-title="x derivative" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_2/dx.png" alt="x derivative" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>x derivative</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_2/dy.png" data-title="y derivative" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_2/dy.png" alt="y derivative" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>y derivative</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_2/gradient.png" data-title="gradient magnitude before thresholding" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_2/gradient.png" alt="gradient magnitude before thresholding" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>gradient magnitude before thresholding</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_2/edges.png" data-title="binary edges, threshold = 0.2" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_2/edges.png" alt="binary edges, threshold = 0.2" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>binary edges, threshold = 0.2</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part1_2/thresholds.jpg" data-title="thresholds 0.1, 0.15, 0.2, and 0.25; I chose 0.2 to reduce distracting ground detail" data-crop="--crop-ratio:3.850746;">
+<img src="assets/part1_2/thresholds.jpg" alt="thresholds 0.1, 0.15, 0.2, and 0.25; I chose 0.2 to reduce distracting ground detail" width="1290" height="335" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>thresholds 0.1, 0.15, 0.2, and 0.25; I chose 0.2 to reduce distracting ground detail</figcaption></figure>
+</section>
+<section id="part1-3"><p class="section-label">Part 1.3</p><h2>Derivative of Gaussian</h2>
+<p class="explanation">I constructed a 2D Gaussian by creating a 1D Gaussian of size K and multiplying it by its transpose, which creates a 2D Gaussian. My kernel size is 9 x 9 and sigma = 1. By applying a Gaussian on an image, we smooth the image, reducing high frequency noise and fine texture such as the little specks and lines we were seeing in the grass. Our result in 1.3 reduces the noisy detail seen in 1.2.</p>
+<p class="explanation">I constructed the DoG filters by using this idea of d_x * (g * f) becoming (d_x * g) * f since convolutions are associative. The same applies to d_y, so once we construct the filters, instead of applying 3 convolutions on the image, we only apply 2. This uses fewer convolutions, though the runtime also depends on the filter sizes. Smoothing and then differentiating and using the DoG directly give the same result apart from tiny floating point differences, and the thresholded images are identical.</p>
+<p class="explanation">I kept the full blurred image until after differentiating and then cropped it back to the original size, so both methods also match at the boundaries. The largest difference in gradient magnitude is about 1.17 x 10^-15. The DoG filters are 17 x 17 since I convolved the 9 x 9 Gaussian with the difference filters stored in 9 x 9 arrays using full convolution.</p>
+<pre><code>kernel_1d = cv2.getGaussianKernel(ksize = 9, sigma = 1)
+kernel_2d = kernel_1d @ kernel_1d.T
+derivative_x_gaussian = convolve2d(kernel_2d, d_x, mode = &#x27;full&#x27;)
+derivative_y_gaussian = convolve2d(kernel_2d, d_y, mode = &#x27;full&#x27;)</code></pre>
+<div class="gallery columns-3">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_3/blurred.png" data-title="blurred cameraman, sigma = 1" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_3/blurred.png" alt="blurred cameraman, sigma = 1" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>blurred cameraman, sigma = 1</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_3/gaussian_gradient.png" data-title="gradient magnitude after smoothing" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_3/gaussian_gradient.png" alt="gradient magnitude after smoothing" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>gradient magnitude after smoothing</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part1_3/gaussian_edges.png" data-title="binary edges after smoothing, threshold = 0.15" data-crop="--crop-ratio:0.996310;">
+<img src="assets/part1_3/gaussian_edges.png" alt="binary edges after smoothing, threshold = 0.15" width="540" height="542" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>binary edges after smoothing, threshold = 0.15</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part1_3/filters.jpg" data-title="DoG filters in x and y; zero is shown as middle gray" data-crop="--crop-ratio:1.909091;">
+<img src="assets/part1_3/filters.jpg" alt="DoG filters in x and y; zero is shown as middle gray" width="630" height="330" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>DoG filters in x and y; zero is shown as middle gray</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part1_3/comparison.jpg" data-title="finite differences compared with Gaussian smoothing; both binary images use threshold = 0.2" data-crop="--crop-ratio:0.961538;">
+<img src="assets/part1_3/comparison.jpg" alt="finite differences compared with Gaussian smoothing; both binary images use threshold = 0.2" width="625" height="650" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>finite differences compared with Gaussian smoothing; both binary images use threshold = 0.2</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part1_3/equivalence.jpg" data-title="blur then differentiate compared with a single DoG convolution per direction; both binary images use threshold = 0.15" data-crop="--crop-ratio:0.984615;">
+<img src="assets/part1_3/equivalence.jpg" alt="blur then differentiate compared with a single DoG convolution per direction; both binary images use threshold = 0.15" width="640" height="650" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>blur then differentiate compared with a single DoG convolution per direction; both binary images use threshold = 0.15</figcaption></figure>
+</section>
+<section id="part2-1"><p class="section-label">Part 2.1</p><h2>Sharpening</h2>
+<p class="explanation">A blurred image that was created by convolving with a Gaussian kernel is essentially the original image with less high frequency detail. Therefore, subtracting the blurred image from the original image gives us the high frequency detail since (high frequency + low frequency detail) - low frequency detail = high frequency detail. If we want to sharpen a blurry image, we usually want to emphasize the remaining high frequency detail, so we add alpha * high frequency detail to the image. The equation then becomes f + alpha * (f - g * f) = (1 + alpha) * f - alpha * (g * f) = f * ((1 + alpha) * e - alpha * g), where e is the impulse filter and * between filters and images means convolution. The sharpening filter then becomes (1 + alpha) * e - alpha * g.</p>
+<p class="explanation">By increasing alpha, we increase the strength of the high frequency parts of the image, but after increasing it too much, the image can start to look weird and different from the original. In the Taj Mahal image, increasing alpha makes the edges of the building stand out more, but larger values can also amplify noise and create halos around the edges. I used alpha = 2 and sigma = 1 for the Taj Mahal result.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_1/taj_process.jpg" data-title="Taj Mahal: original, blurred image, high frequencies, and sharpened result; sigma = 1, alpha = 2" data-crop="--crop-ratio:3.681115;">
+<img src="assets/part2_1/taj_process.jpg" alt="Taj Mahal: original, blurred image, high frequencies, and sharpened result; sigma = 1, alpha = 2" width="1189" height="323" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Taj Mahal: original, blurred image, high frequencies, and sharpened result; sigma = 1, alpha = 2</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_1/taj_amounts.jpg" data-title="Taj Mahal with alpha = 0, 1, 2, and 4; sigma stays at 1" data-crop="--crop-ratio:3.856716;">
+<img src="assets/part2_1/taj_amounts.jpg" alt="Taj Mahal with alpha = 0, 1, 2, and 4; sigma stays at 1" width="1292" height="335" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Taj Mahal with alpha = 0, 1, 2, and 4; sigma stays at 1</figcaption></figure>
+<p class="explanation">In the F-15 image, I used alpha = 1.5 and sigma = 2, which makes the edges of the wings and body stand out more. The image still looks a little blurry since the original image was already blurry, so sharpening cannot fully recover the missing detail. Increasing alpha further also makes the noise in the sky more noticeable, so a larger alpha does not necessarily make the image look better.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_1/f15_process.jpg" data-title="F-15: original, blurred image, high frequencies, and sharpened result; sigma = 2, alpha = 1.5" data-crop="--crop-ratio:3.559880;">
+<img src="assets/part2_1/f15_process.jpg" alt="F-15: original, blurred image, high frequencies, and sharpened result; sigma = 2, alpha = 1.5" width="1189" height="334" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>F-15: original, blurred image, high frequencies, and sharpened result; sigma = 2, alpha = 1.5</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_1/f15_amounts.jpg" data-title="F-15 with alpha = 0, 1, 2, and 4; sigma stays at 2" data-crop="--crop-ratio:3.858006;">
+<img src="assets/part2_1/f15_amounts.jpg" alt="F-15 with alpha = 0, 1, 2, and 4; sigma stays at 2" width="1277" height="331" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>F-15 with alpha = 0, 1, 2, and 4; sigma stays at 2</figcaption></figure>
+<p class="explanation">When we blur an image and then sharpen it again, it becomes sharper but does not become the same as the original image since sharpening emphasizes the detail that remains and does not fully recover the detail lost from blurring as shown below. I blurred the portrait using sigma = 2 and a 13 x 13 kernel, and then sharpened it using sigma = 1 and alpha = 2.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_1/blur_resharpen.jpg" data-title="original sharp portrait, blurred portrait, and resharpened portrait; some fine detail is still lost" data-crop="--crop-ratio:2.668750;">
+<img src="assets/part2_1/blur_resharpen.jpg" alt="original sharp portrait, blurred portrait, and resharpened portrait; some fine detail is still lost" width="854" height="320" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>original sharp portrait, blurred portrait, and resharpened portrait; some fine detail is still lost</figcaption></figure>
+<p class="explanation">The high frequency images have 0.5 added for display, so zero is middle gray. This offset is not added when computing the sharpened image.</p>
+</section>
+<section id="part2-2"><p class="section-label">Part 2.2</p><h2>Hybrid images</h2>
+<p class="explanation">A hybrid image is essentially the low frequency detail of one image added to the high frequency detail of another image. We get the low frequency detail by convolving the first image with a Gaussian, and we get the high frequency detail by subtracting the blurred second image from the second image. Therefore, the result becomes g_low * im1 + (im2 - g_high * im2). When we look at the image up close, we can see the high frequency detail more clearly, and when we look farther away, the low frequency image becomes more noticeable.</p>
+<h3>Derek and Nutmeg</h3>
+<p class="explanation">For Derek and Nutmeg, I used the provided images since both have facial features that we can align. I aligned their eyes using the starter code, which shifts, scales, and rotates the images, and then cropped both images to the same area. Derek supplies the low frequency detail with sigma = 5, and Nutmeg supplies the high frequency detail with sigma = 2. Up close, we can see Nutmeg’s fur, eyes, and whiskers, while farther away, we can see Derek’s face more clearly. However, their face shapes are different, so parts of Derek’s hair and Nutmeg’s ears are still visible together.</p>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/originals/derek.jpg" data-title="Derek original, before alignment" data-crop="--crop-ratio:0.714000;">
+<img src="assets/originals/derek.jpg" alt="Derek original, before alignment" width="357" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Derek original, before alignment</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/originals/nutmeg.jpg" data-title="Nutmeg original, before alignment" data-crop="--crop-ratio:1.333333;">
+<img src="assets/originals/nutmeg.jpg" alt="Nutmeg original, before alignment" width="500" height="375" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Nutmeg original, before alignment</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_2/derek_nutmeg_results.jpg" data-title="aligned Derek and Nutmeg inputs and the hybrid" data-crop="--crop-ratio:2.846875;">
+<img src="assets/part2_2/derek_nutmeg_results.jpg" alt="aligned Derek and Nutmeg inputs and the hybrid" width="911" height="320" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>aligned Derek and Nutmeg inputs and the hybrid</figcaption></figure>
+<h3>Basketball and Death Star</h3>
+<p class="explanation">For basketball and Death Star, I chose these images since both are round, but the basketball has large dark seams while the Death Star has a lot of small surface detail. I cropped the spheres and resized them to the same diameter, and then centered both on white 400 x 400 images. The basketball supplies the low frequency detail, and the Death Star supplies the high frequency detail.</p>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/originals/basketball.jpg" data-title="basketball original, before cropping and alignment" data-crop="--crop-ratio:1.506024;">
+<img src="assets/originals/basketball.jpg" alt="basketball original, before cropping and alignment" width="500" height="332" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>basketball original, before cropping and alignment</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/originals/deathstar.jpg" data-title="Death Star original, before cropping and alignment" data-crop="--crop-ratio:1.000000;">
+<img src="assets/originals/deathstar.jpg" alt="Death Star original, before cropping and alignment" width="500" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Death Star original, before cropping and alignment</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_2/basketball_deathstar_results.jpg" data-title="aligned basketball and Death Star inputs and the hybrid" data-crop="--crop-ratio:2.877246;">
+<img src="assets/part2_2/basketball_deathstar_results.jpg" alt="aligned basketball and Death Star inputs and the hybrid" width="961" height="334" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>aligned basketball and Death Star inputs and the hybrid</figcaption></figure>
+<p class="explanation">I tested low sigma = 4 and high sigma = 1, low sigma = 8 and high sigma = 3, and low sigma = 12 and high sigma = 5. With 4 and 1, the basketball seams were very noticeable, but the Death Star detail was harder to see. With 12 and 5, the basketball became more blurred and the Death Star became more noticeable. I chose low sigma = 8 and high sigma = 3 since we can see the Death Star’s surface up close and the basketball’s seams farther away. Some basketball seams are still visible up close, so the result is not a complete switch between the two images.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_2/basketball_deathstar_cutoffs.jpg" data-title="sigma experiments: (4, 1), (8, 3), and (12, 5)" data-crop="--crop-ratio:2.877246;">
+<img src="assets/part2_2/basketball_deathstar_cutoffs.jpg" alt="sigma experiments: (4, 1), (8, 3), and (12, 5)" width="961" height="334" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>sigma experiments: (4, 1), (8, 3), and (12, 5)</figcaption></figure>
+<div class="gallery columns-3">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_2/basketball_deathstar_low_filtered.png" data-title="basketball low frequencies, sigma = 8" data-crop="--crop-ratio:1.000000;">
+<img src="assets/part2_2/basketball_deathstar_low_filtered.png" alt="basketball low frequencies, sigma = 8" width="400" height="400" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>basketball low frequencies, sigma = 8</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_2/basketball_deathstar_high_filtered.png" data-title="Death Star high frequencies, sigma = 3" data-crop="--crop-ratio:1.000000;">
+<img src="assets/part2_2/basketball_deathstar_high_filtered.png" alt="Death Star high frequencies, sigma = 3" width="400" height="400" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Death Star high frequencies, sigma = 3</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_2/basketball_deathstar_hybrid.png" data-title="final basketball / Death Star hybrid" data-crop="--crop-ratio:1.000000;">
+<img src="assets/part2_2/basketball_deathstar_hybrid.png" alt="final basketball / Death Star hybrid" width="400" height="400" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>final basketball / Death Star hybrid</figcaption></figure>
+</div>
+<p class="explanation">The Fourier transforms are calculated using log(1 + abs(fftshift(fft2(image)))). The center shows the low frequencies, while the frequencies farther from the center are higher frequencies. By blurring the basketball, we reduce its high frequency detail and keep its low frequency structure. By subtracting the blurred Death Star from the original Death Star, we reduce its low frequency structure and keep more of its high frequency detail. The hybrid then contains both of these parts. We use the log since otherwise the strongest values would make the smaller values difficult to see.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_2/basketball_deathstar_process.jpg" data-title="favorite hybrid: aligned inputs, low-pass and high-pass results, hybrid, and the five log-magnitude Fourier transforms" data-crop="--crop-ratio:2.474747;">
+<img src="assets/part2_2/basketball_deathstar_process.jpg" alt="favorite hybrid: aligned inputs, low-pass and high-pass results, hybrid, and the five log-magnitude Fourier transforms" width="1470" height="594" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>favorite hybrid: aligned inputs, low-pass and high-pass results, hybrid, and the five log-magnitude Fourier transforms</figcaption></figure>
+<h3>Jason Kelce and Gimli</h3>
+<p class="explanation">For Jason Kelce and Gimli, I chose these images since both have large beards and similar positions for their eyes and mouths. I aligned their eyes using the starter code, which shifts, scales, and rotates the images, and then cropped both images to the same area. Kelce supplies the low frequency detail with sigma = 8, and Gimli supplies the high frequency detail with sigma = 3. Up close, we can see the patterns on Gimli&#x27;s helmet and the fine detail in his beard, while farther away, we can see Kelce&#x27;s face more clearly. The helmet is still a little visible at a distance, and their beard shapes are different, so some parts of both images remain visible together.</p>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/originals/kelce.jpg" data-title="Jason Kelce original, before alignment" data-crop="--crop-ratio:1.377410;">
+<img src="assets/originals/kelce.jpg" alt="Jason Kelce original, before alignment" width="500" height="363" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Jason Kelce original, before alignment</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/originals/gimli.jpg" data-title="Gimli original, before alignment" data-crop="--crop-ratio:1.000000;">
+<img src="assets/originals/gimli.jpg" alt="Gimli original, before alignment" width="500" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Gimli original, before alignment</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_2/kelce_gimli_results.jpg" data-title="aligned Jason Kelce and Gimli inputs and the hybrid" data-crop="--crop-ratio:2.662500;">
+<img src="assets/part2_2/kelce_gimli_results.jpg" alt="aligned Jason Kelce and Gimli inputs and the hybrid" width="852" height="320" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>aligned Jason Kelce and Gimli inputs and the hybrid</figcaption></figure>
+</section>
+<section id="part2-3"><p class="section-label">Part 2.3</p><h2>Gaussian and Laplacian stacks</h2>
+<p class="explanation">I constructed Gaussian and Laplacian stacks for the apple and orange images. Every level keeps the same image dimensions since we only blur the image and do not downsample it. Therefore, each pixel stays at the same location across the levels, which allows us to subtract the levels and later blend them together.</p>
+<p class="explanation">The first Gaussian level is the original image. I produce each next level by convolving the previous level with a Gaussian. I used 6 levels, with sigma = 2, 4, 8, 16, and 32 for the successive blurs. As we go through the stack, the image becomes more blurred since we are removing more of the high frequency detail.</p>
+<p class="explanation">I constructed the Laplacian levels by subtracting neighboring Gaussian levels, so L[i] = G[i] - G[i + 1]. This gives us the detail that was removed between those two levels. The earlier levels contain finer detail, while the later levels contain broader changes in intensity. I kept the final coarse Gaussian as the last Laplacian level since the differences alone would not contain the remaining low frequency information.</p>
+<p class="explanation">When we sum the Laplacian levels, the neighboring Gaussian terms cancel out, and adding the final Gaussian gives us the original image again. Our results reconstruct the original apart from tiny floating point differences.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_3/apple_stacks.jpg" data-title="apple Gaussian stack on the top row and Laplacian stack on the bottom row; six levels, all 300 x 300" data-crop="--crop-ratio:2.978626;">
+<img src="assets/part2_3/apple_stacks.jpg" alt="apple Gaussian stack on the top row and Laplacian stack on the bottom row; six levels, all 300 x 300" width="1951" height="655" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>apple Gaussian stack on the top row and Laplacian stack on the bottom row; six levels, all 300 x 300</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_3/orange_stacks.jpg" data-title="orange Gaussian stack on the top row and Laplacian stack on the bottom row; six levels, all 300 x 300" data-crop="--crop-ratio:2.978626;">
+<img src="assets/part2_3/orange_stacks.jpg" alt="orange Gaussian stack on the top row and Laplacian stack on the bottom row; six levels, all 300 x 300" width="1951" height="655" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>orange Gaussian stack on the top row and Laplacian stack on the bottom row; six levels, all 300 x 300</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_3/oraple_stacks.jpg" data-title="oraple Gaussian and Laplacian stacks; the final Laplacian level is the coarse Gaussian residual" data-crop="--crop-ratio:2.974790;">
+<img src="assets/part2_3/oraple_stacks.jpg" alt="oraple Gaussian and Laplacian stacks; the final Laplacian level is the coarse Gaussian residual" width="1770" height="595" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>oraple Gaussian and Laplacian stacks; the final Laplacian level is the coarse Gaussian residual</figcaption></figure>
+</section>
+<section id="part2-4"><p class="section-label">Part 2.4</p><h2>Multiresolution blending</h2>
+<p class="explanation">I constructed a Gaussian stack for the mask using the same idea as in 2.3. The first level is the original mask, and each next level is created by blurring the previous level with a Gaussian. The white parts of the mask select the first image, and the black parts select the second image. As we blur the mask, the border becomes smoother and the values around it become a mix between 0 and 1.</p>
+<p class="explanation">At each level, we multiply the first image’s Laplacian level by the corresponding mask level and the second image’s Laplacian level by 1 minus that mask level. Therefore, the blended level becomes M[i] * L1[i] + (1 - M[i]) * L2[i], where the multiplication is done at each pixel. We then sum all the blended levels, including the final coarse level, to reconstruct the final image.</p>
+<p class="explanation">This gives a smoother transition than a hard cut since we blend the different frequency levels with different amounts of mask smoothing. The fine detail uses a sharper mask, while the broader intensity changes use a more blurred mask. Therefore, we can keep the detail around the border while making the larger changes in intensity less sudden.</p>
+<h3>Oraple</h3>
+<p class="explanation">For the oraple, I used a mask that selects the apple on the left and the orange on the right. I used 6 stack levels, and the result has a smoother transition between the two fruits than simply cutting and joining the images.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/oraple_results.jpg" data-title="apple input, orange input, left-half mask, and final oraple" data-crop="--crop-ratio:3.856716;">
+<img src="assets/part2_4/oraple_results.jpg" alt="apple input, orange input, left-half mask, and final oraple" width="1292" height="335" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>apple input, orange input, left-half mask, and final oraple</figcaption></figure>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_4/oraple_mask.png" data-title="left-half mask: white selects apple, black selects orange" data-crop="--crop-ratio:1.000000;">
+<img src="assets/part2_4/oraple_mask.png" alt="left-half mask: white selects apple, black selects orange" width="300" height="300" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>left-half mask: white selects apple, black selects orange</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_4/oraple_final.png" data-title="final oraple" data-crop="--crop-ratio:1.000000;">
+<img src="assets/part2_4/oraple_final.png" alt="final oraple" width="300" height="300" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>final oraple</figcaption></figure>
+</div>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/oraple_mask_stack.jpg" data-title="Gaussian mask stack: the transition becomes wider at the coarser levels" data-crop="--crop-ratio:5.792285;">
+<img src="assets/part2_4/oraple_mask_stack.jpg" alt="Gaussian mask stack: the transition becomes wider at the coarser levels" width="1952" height="337" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Gaussian mask stack: the transition becomes wider at the coarser levels</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/oraple_comparison.jpg" data-title="hard cut compared with multiresolution blending" data-crop="--crop-ratio:1.909091;">
+<img src="assets/part2_4/oraple_comparison.jpg" alt="hard cut compared with multiresolution blending" width="630" height="330" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>hard cut compared with multiresolution blending</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/oraple_process.jpg" data-title="Figure 3.42 (a)–(l) layout: masked apple, masked orange, and combined levels 0, 2, and 4 in the first three rows; reconstructed contributions and final blend in the last row" data-crop="--crop-ratio:0.729008;">
+<img src="assets/part2_4/oraple_process.jpg" alt="Figure 3.42 (a)–(l) layout: masked apple, masked orange, and combined levels 0, 2, and 4 in the first three rows; reconstructed contributions and final blend in the last row" width="955" height="1310" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Figure 3.42 (a)–(l) layout: masked apple, masked orange, and combined levels 0, 2, and 4 in the first three rows; reconstructed contributions and final blend in the last row</figcaption></figure>
+<h3>Curry and the Dragon Ball</h3>
+<p class="explanation">For the custom blends, I resized the Dragon Ball to fit over Curry’s basketball and positioned it in the same area. I also resized the blue shell and positioned it over the football in Josh Allen’s hand. These positioned images were saved as inputs before blending. I used 3 stack levels for both results. The irregular masks follow the objects’ shapes, including the blue shell’s spikes, and leave out the areas covering the players’ hands so the hands come from the original photos.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/curry_results.jpg" data-title="positioned Dragon Ball input, original Curry photo, irregular mask, and final blend" data-crop="--crop-ratio:3.440625;">
+<img src="assets/part2_4/curry_results.jpg" alt="positioned Dragon Ball input, original Curry photo, irregular mask, and final blend" width="1101" height="320" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>positioned Dragon Ball input, original Curry photo, irregular mask, and final blend</figcaption></figure>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_4/curry_mask.png" data-title="Dragon Ball mask with the hand area left out" data-crop="--crop-ratio:0.576000;">
+<img src="assets/part2_4/curry_mask.png" alt="Dragon Ball mask with the hand area left out" width="288" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Dragon Ball mask with the hand area left out</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_4/curry_final.png" data-title="Curry with the Dragon Ball" data-crop="--crop-ratio:0.576000;">
+<img src="assets/part2_4/curry_final.png" alt="Curry with the Dragon Ball" width="288" height="500" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Curry with the Dragon Ball</figcaption></figure>
+</div>
+<p class="explanation">I used the Curry result as my favorite blending example. The process below shows the Dragon Ball’s masked levels, the original photo’s masked levels, and their sums. The bottom row shows each image’s reconstructed contribution and the final blend.</p>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/curry_mask_stack.jpg" data-title="three Gaussian levels of the irregular Dragon Ball mask" data-crop="--crop-ratio:2.428125;">
+<img src="assets/part2_4/curry_mask_stack.jpg" alt="three Gaussian levels of the irregular Dragon Ball mask" width="777" height="320" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>three Gaussian levels of the irregular Dragon Ball mask</figcaption></figure>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/curry_process.jpg" data-title="favorite blend: masked levels 0, 1, and 2, followed by reconstructed contributions and the final image" data-crop="--crop-ratio:0.587786;">
+<img src="assets/part2_4/curry_process.jpg" alt="favorite blend: masked levels 0, 1, and 2, followed by reconstructed contributions and the final image" width="770" height="1310" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>favorite blend: masked levels 0, 1, and 2, followed by reconstructed contributions and the final image</figcaption></figure>
+<h3>Josh Allen and the blue shell</h3>
+<figure class="wide-figure">
+<a class="result-link figure-image" href="assets/part2_4/josh_results.jpg" data-title="positioned blue shell input, original Josh photo, irregular mask, and final blend" data-crop="--crop-ratio:6.036866;">
+<img src="assets/part2_4/josh_results.jpg" alt="positioned blue shell input, original Josh photo, irregular mask, and final blend" width="1310" height="217" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>positioned blue shell input, original Josh photo, irregular mask, and final blend</figcaption></figure>
+<div class="gallery columns-2">
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_4/josh_mask.png" data-title="blue shell mask following the spikes and preserving the hand" data-crop="--crop-ratio:1.779359;">
+<img src="assets/part2_4/josh_mask.png" alt="blue shell mask following the spikes and preserving the hand" width="500" height="281" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>blue shell mask following the spikes and preserving the hand</figcaption></figure>
+<figure class="result-figure">
+<a class="result-link figure-image" href="assets/part2_4/josh_final.png" data-title="Josh Allen with the blue shell" data-crop="--crop-ratio:1.779359;">
+<img src="assets/part2_4/josh_final.png" alt="Josh Allen with the blue shell" width="500" height="281" loading="lazy"><span class="enlarge" aria-hidden="true">↗</span></a>
+<figcaption>Josh Allen with the blue shell</figcaption></figure>
+</div>
+</section>
+<section id="reflection"><p class="section-label">Reflection and credits</p><h2>What I learned</h2>
+<p class="explanation">The most important thing I learned from this project is that an image contains both high frequency and low frequency information, and we can use these parts separately to create different effects. I thought it was cool that we could take advantage of how our eyes see detail up close and broader shapes farther away to create these illusions. By combining the high frequency detail of one image with the low frequency detail of another image, the result can look like one image up close and a different image farther away. This helped me understand how the different frequencies in an image affect what we see.</p>
+<h3>Credits</h3>
+<p class="explanation">I used the supplied align_image_code.py starter code to prepare the Derek/Nutmeg and Kelce/Gimli inputs. The prepared inputs were saved after alignment and cropping. The image sources are listed below.</p>
+<ul class="credits"><li>self portrait — <a href="https://rohram.github.io/cs180-/docs/project0/assets/part-1-far.jpg">my photo from Project 0</a></li><li>cameraman, Derek, Nutmeg, apple, and orange — <a href="https://cal-cs180.github.io/fa26/hw/proj2/index.html">course images and supplied starter archives</a></li><li>Taj Mahal — <a href="https://cal-cs180.github.io/fa26/hw/proj2/files/taj.jpg">course sharpening image</a></li><li>F-15 — <a href="https://commons.wikimedia.org/wiki/File:Slightly_blurry_shot_of_an_F-15_in_a_very_tight_turn_-_so_cool!_(2501424264).jpg">Wikimedia Commons</a></li><li>basketball — <a href="https://www.gogglesnmore.com/blog/common-basketball-violations-and-fouls/">GogglesNMore</a></li><li>Death Star — <a href="https://www.pngegg.com/en/png-mwoyy">Star Wars artwork via PNGEgg</a></li><li>Jason Kelce headshot — <a href="https://www.espn.com/nfl/player/_/id/14124/jason-kelce">ESPN</a></li><li>Gimli — <a href="https://twitter.com/OrtaDunyaCom/status/1654533663801892865">The Lord of the Rings film image via OrtaDunyaCom</a></li><li>Stephen Curry shooting — <a href="https://commons.wikimedia.org/wiki/File:Stephen_Curry_shooting.jpg">Wikimedia Commons</a></li><li>four-star Dragon Ball — <a href="https://www.pngwing.com/en/free-png-zaysi">Dragon Ball artwork via PNGWing</a></li><li>Josh Allen throwing — <a href="https://www.wgrz.com/article/sports/nfl/bills/buffalo-bills-josh-allen-offseason-throwing-mechanics/71-13e545e4-da03-46f9-89fd-f3078b6f3744">WGRZ</a></li><li>blue shell — <a href="https://www.mariowiki.com/Spiny_Shell_(blue)">Nintendo artwork via Super Mario Wiki</a></li></ul>
+</section>
+
+</article></div>
+<footer><a href="../project1.html">← Project 1<span>Images of the Russian Empire</span></a><a href="#top">Back to top ↑</a><a href="../index.html">All projects →</a></footer>
+</main>
+<dialog class="lightbox" aria-labelledby="lightbox-caption">
+<button class="close-lightbox" type="button" aria-label="Close image">×</button>
+<div class="lightbox-image"><img src="" alt=""></div><p id="lightbox-caption"></p>
+<div class="lightbox-actions"><button class="previous-image" type="button" aria-label="Previous image">← Previous</button><a class="original-image" target="_blank" rel="noopener">Open full-size image ↗</a><button class="next-image" type="button" aria-label="Next image">Next →</button></div>
+</dialog>
+</body>
+</html>

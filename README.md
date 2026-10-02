@@ -28,6 +28,10 @@ The write-up includes all 14 provided images and three additional Library of Con
 - [Computed offsets](docs/offsets.json)
 - [Additional image sources](docs/additional-sources.json)
 
+## Project 2
+
+[Fun with filters and frequencies](docs/project2/index.html) includes convolution code snippets, runtime comparisons, finite differences, DoG filters, sharpening, three hybrid images, Gaussian and Laplacian stacks, and three multiresolution blends.
+
 ## Repository layout
 
 ```text
@@ -35,6 +39,7 @@ docs/                 Portfolio website, project pages, and image assets
   index.html          Portfolio homepage
   project0/           Project 0
   project1.html       Project 1
+  project2/           Project 2 write-up and image results
   page.pdf            Project 1 write-up
 index.html            Entry point for GitHub Pages
 ```
