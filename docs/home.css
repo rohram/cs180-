@@ -81,3 +81,5 @@ footer a:hover {color:var(--blue);text-decoration:underline;}
 
 .frequency-art img {object-fit:contain;background:white;}
 @media(min-width:681px) and (max-width:1000px){.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.flow-art{background:#e7e4da;display:grid;place-items:center}.flow-art img{width:100%;height:100%;object-fit:contain;background:#fff}.flow-art .art-tag{bottom:14px}
