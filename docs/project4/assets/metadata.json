@@ -1,0 +1,162 @@
+{
+  "source-0033.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0033.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "source-0034.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0034.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "source-0035.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0035.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "correspondences-1.jpg": {
+    "width": 1200,
+    "height": 565
+  },
+  "mosaic-1-feather.webp": {
+    "width": 1600,
+    "height": 1316
+  },
+  "mosaic-1-two-band.webp": {
+    "width": 1600,
+    "height": 1316
+  },
+  "source-0036.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0036.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "source-0037.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0037.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "source-0038.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0038.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "correspondences-2.jpg": {
+    "width": 1200,
+    "height": 565
+  },
+  "mosaic-2-feather.webp": {
+    "width": 1600,
+    "height": 1285
+  },
+  "mosaic-2-two-band.webp": {
+    "width": 1600,
+    "height": 1285
+  },
+  "source-0039.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0039.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "source-0040.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0040.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "source-0041.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "points-0041.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "correspondences-3.jpg": {
+    "width": 1200,
+    "height": 565
+  },
+  "mosaic-3-feather.webp": {
+    "width": 1600,
+    "height": 1171
+  },
+  "mosaic-3-two-band.webp": {
+    "width": 1600,
+    "height": 1171
+  },
+  "door-source.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "door-corners.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "door-nearest.webp": {
+    "width": 600,
+    "height": 1600
+  },
+  "door-detail-nearest.png": {
+    "width": 270,
+    "height": 260
+  },
+  "door-bilinear.webp": {
+    "width": 600,
+    "height": 1600
+  },
+  "door-detail-bilinear.png": {
+    "width": 270,
+    "height": 260
+  },
+  "menu-source.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "menu-corners.jpg": {
+    "width": 1100,
+    "height": 1467
+  },
+  "menu-nearest.webp": {
+    "width": 850,
+    "height": 1100
+  },
+  "menu-detail-nearest.png": {
+    "width": 730,
+    "height": 245
+  },
+  "menu-bilinear.webp": {
+    "width": 850,
+    "height": 1100
+  },
+  "menu-detail-bilinear.png": {
+    "width": 730,
+    "height": 245
+  },
+  "two-band-comparison.webp": {
+    "width": 1240,
+    "height": 475
+  }
+}
